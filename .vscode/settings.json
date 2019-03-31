@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "/Users/blopker/.local/share/virtualenvs/fline-api-Bf_YB4KE/bin/python"
+    "python.pythonPath": ".venv/bin/python",
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true
 }
