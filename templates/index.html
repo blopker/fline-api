@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" width="100%" height="100%">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,13 +9,46 @@
       rel="stylesheet"
       href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css"
     />
-  </head>
-
-  <body>
-    <img id="result" width="400px" src="" alt="" />
-    <div class="ct-chart"></div>
     <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
     <script src="/image.min.js"></script>
+    <script src="/lib.js"></script>
+    <script src="/drop.js"></script>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        min-height: 100%;
+      }
+
+      .ct-chart-wrapper {
+        margin: auto;
+      }
+
+      .ct-chart {
+        width: 90vw;
+        height: 90vw;
+        max-height: 500px;
+        max-width: 500px;
+      }
+    </style>
+  </head>
+
+  <body
+    ondrop="dropHandler(event);"
+    ondragover="dragOverHandler(event);"
+    width="100%"
+    height="100%"
+  >
+    <input
+      type="file"
+      id="image-uploads"
+      name="image-uploads"
+      accept="image/*"
+    />
+    <div class="ct-chart-wrapper">
+      <div class="ct-chart"></div>
+    </div>
     <script src="/main.js"></script>
   </body>
 </html>
