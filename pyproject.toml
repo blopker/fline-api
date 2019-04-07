@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "fline-api"
+version = "0.1.0"
+description = ""
+authors = ["Bo"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+opencv-python = "*"
+gunicorn = "*"
+falcon-jinja2 = "*"
+matplotlib = "*"
+falcon = { version = "~2.0.0b1", allows-prereleases = true }
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.7"
+mypy = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
