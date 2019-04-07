@@ -1,5 +1,3 @@
-data_folder <- "Alison_03_19_19"
-day <- "March 19th"
 library(ggplot2)
 library(zoo)
 library(lubridate)
@@ -11,21 +9,33 @@ library(grid)
 library("stringi", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
 library("stringr", lib.loc="/Library/Frameworks/R.framework/Versions/3.5/Resources/library")
 
-#TO_DOOO
-#make any negative spike in hashed red. Below baseline dip. Reactive hypoglycemia
-#in the daily plot, show in red if the lines go below 4. also show in indiv plot. 
+#select the folder. The folder contains "bg.csv" which is the output of the digitizer, and "food_log.csv"
+data_folder <- "Alison_03_19_19"
 
-#importing and data formating. 
-raw <- as.data.frame(read.csv(paste("~/Dropbox/Fline/Plots from 2019 pilot/", data_folder, "/bg", ".csv", sep=""), as.is=TRUE, sep = "\t"))
-food_log <- as.data.frame(read.csv(paste("~/Dropbox/Fline/Plots from 2019 pilot/", data_folder, "/food_log.csv", sep="")), header=TRUE, sep=",")
-colnames(raw) <- c("time", "bg")
-raw$id <- seq.int(nrow(raw))
-#graph digitization data:
-raw$time <- hm(mapply(paste, hour(ymd_hms(raw$time)), ":", minute(ymd_hms(raw$time)), SIMPLIFY=FALSE))
+#This is used in the plot titles
+day <- "March 19th"
 
-#susan's raw data
-#raw$time <- hm(mapply(paste, hour(ymd_hms(raw$time)), ":", minute(ymd_hms(raw$time)), SIMPLIFY=FALSE))
+#wrapper function that I use to wrap the labels in the graph annotations
 wrapper <- function(x, ...) paste(stri_wrap(x, ...), collapse = "\n")
+
+#import food_log. It's already correctly formatted.
+food_log <- as.data.frame(read.csv(paste("~/Dropbox/Fline/Plots from 2019 pilot/", data_folder, "/food_log.csv", sep="")), header=TRUE, sep=",")
+
+#import the BG data
+raw <- as.data.frame(read.csv(paste("~/Dropbox/Fline/Plots from 2019 pilot/", data_folder, "/bg", ".csv", sep=""), as.is=TRUE, sep = "\t"))
+#only keep the the hour, minute, second.
+colnames(raw) <- c("time", "bg")
+#I use the lubridate library to format the time to look like this: "3H 30M 0S"
+raw$time <- hm(mapply(paste, hour(ymd_hms(raw$time)), ":", minute(ymd_hms(raw$time)), SIMPLIFY=FALSE))
+raw$id <- seq.int(nrow(raw))
+
+#you can ignore this - this was the special formatting for Susan's android raw data
+#raw$time <- hm(mapply(paste, hour(ymd_hms(raw$time)), ":", minute(ymd_hms(raw$time)), SIMPLIFY=FALSE))
+
+#this function takes in the time of a food from "food_log", and searches in "raw" for what the user's
+#glucose was at that time. it returns the row number of that glucose value.
+#the matching is based on taking the difference between the food time and all the times listed in "raw",
+#and selecting the one with the smallest difference. 
 find_beginning <- function (food_time) {
   #converts into good format + sets 2 hours later. 
   line_start <- hm(food_time)
@@ -34,6 +44,10 @@ find_beginning <- function (food_time) {
   closest_time <- head((raw[order(raw$difference),]), n= 1)
   return(closest_time$id)
 }
+
+#same concept as above, but finds what the glucose value was 2 hours after the food time.
+#please make the "2 hours" a variable - because I can imagine instances where we want to plot
+#graphs for a different window than 2 hours
 find_end <- function (food_time) {
   #converts into good format + sets 2 hours later. 
   line_start <- hm(food_time) + hours(2)
@@ -42,6 +56,9 @@ find_end <- function (food_time) {
   closest_time <- head((raw[order(raw$difference),]), n= 1)
   return(closest_time$id)
 }
+
+#this measures the area under the glucose curve for the 2 hour window. It's an approximation
+#of the "glucose response"
 area <- function (beginning, end){
   sum = round(sum(raw$bg[beginning:end] - raw$bg[beginning])/((end-beginning)/10)) #I divide by end-beginning in case different plots have a differnt number of data points per cm of line. Otherwise for the exact same curve, there will be a bigger sum if the digitization step made more points.
   return(sum)
